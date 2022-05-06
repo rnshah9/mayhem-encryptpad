@@ -3,12 +3,28 @@
 #include <QMimeData>
 #include <QApplication>
 #include <QRegularExpression>
+#include <QScrollBar>
+#include <QTextBlock>
 #include <iostream>
+#include "line_number_area.h"
 
 PlainTextEdit::PlainTextEdit(QWidget *parent) :
-    QPlainTextEdit(parent)
+    QPlainTextEdit(parent),
+    lineNumberArea(new QLineNumberArea(this))
 {
     installEventFilter(this);
+    connect(document(), &QTextDocument::blockCountChanged, this, &PlainTextEdit::updateLineNumberAreaWidth);
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int) { lineNumberArea->update(); });
+}
+
+int PlainTextEdit::getFirstVisibleBlock() const
+{
+    return firstVisibleBlock().blockNumber();
+}
+
+int PlainTextEdit::getContentOffsetY() const
+{
+    return contentOffset().y();
 }
 
 void PlainTextEdit::dragEnterEvent(QDragEnterEvent *event)
@@ -127,4 +143,21 @@ bool PlainTextEdit::eventFilter(QObject *, QEvent *event)
                        QTextCursor::KeepAnchor);
     setTextCursor(cursor);
     return true;
+}
+
+void PlainTextEdit::updateLineNumberAreaWidth(int)
+{
+    setViewportMargins(lineNumberArea->sizeHint().width(), 0, 0, 0);
+}
+
+void PlainTextEdit::paintEvent(QPaintEvent *event)
+{
+    QPlainTextEdit::paintEvent(event);
+    lineNumberArea->update(0, event->rect().y(), lineNumberArea->sizeHint().width(), event->rect().height());
+    QRect cr = contentsRect();
+    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberArea->sizeHint().width(), cr.height()));
+    if (event->rect().contains(viewport()->rect()))
+    {
+        updateLineNumberAreaWidth(0);
+    }
 }

@@ -200,8 +200,9 @@ void Proxy::changeStatusData(const QString &info)
 
 void Proxy::thinCursorModeUpdated(bool thinCursorMode)
 {
-    Editor<QPlainTextEdit> *editor = reinterpret_cast<Editor<QPlainTextEdit>*>(m_widget);
-    editor->SetIsThinCursorRequested(thinCursorMode);
+    Editor<PlainTextEdit> *plainEditor = dynamic_cast<Editor<PlainTextEdit> *>(m_widget);
+    assert(plainEditor);
+    plainEditor->SetIsThinCursorRequested(thinCursorMode);
 }
 
 void Proxy::highlightMatches(const QString &pattern)
