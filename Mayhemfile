@@ -1,0 +1,5 @@
+project: rnshah9/mayhem-encryptpad
+target: encryptcli
+
+cmds:
+  - cmd: /encryptcli --generate-key --key-pwd-file @@
