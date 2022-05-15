@@ -12,6 +12,7 @@ RUN make
 RUN make install
 
 FROM ubuntu:20.04
+
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libbotan-2-dev  
 
